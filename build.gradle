@@ -1,0 +1,44 @@
+description = 'apollo_mqtt_util'
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'maven'
+
+
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+}
+
+compileJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}
+
+compileTestJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}
+
+ext {
+    mqttClientVersion = '1.10'
+
+    junitVersion = '4.12'
+}
+
+dependencies {
+    compile group: "org.fusesource.mqtt-client", name: "mqtt-client", version: "${mqttClientVersion}"
+
+    testCompile group: "junit", name: "junit", version: "${junitVersion}"
+}
+
+apply from: 'gradle_mvn_push_for_jar.gradle'
