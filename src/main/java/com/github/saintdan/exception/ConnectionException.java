@@ -4,6 +4,7 @@ import com.github.saintdan.enums.ErrorType;
 
 /**
  * Connection exception.
+ *
  * @author <a href="http://github.com/saintdan">Liao Yifan</a>
  * @date 6/10/15
  * @since JDK1.8

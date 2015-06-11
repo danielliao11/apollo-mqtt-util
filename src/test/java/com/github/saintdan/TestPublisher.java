@@ -19,56 +19,36 @@ import org.junit.Test;
  */
 public class TestPublisher {
 
-    Apollo apollo = new ApolloImpl();
+    private static final Apollo apollo = new ApolloImpl();
+    private static final Generator generator = new Generator();
+
     private static final String HOST = "tcp://localhost:61613";
-    private static final String USERNAME = "sender";
-    private static final String PASSWORD = "sender";
+    private static final String SENDER = "sender";
     private static final QoS qos = QoS.AT_LEAST_ONCE;
 
     @Test
-    public void testBlocking() throws Exception {
-        TopicBO topic = topicGenerator("test", "Hello Blocking");
-        ConfigBO config = configGenerator(HOST, USERNAME, PASSWORD, ApiType.BLOCKING, qos);
-        boolean published = apollo.publish(topic, config);
+    public void testPBlocking() throws Exception {
+        TopicBO topic = generator.topicGenerator("test", "Hello Blocking");
+        ConfigBO config = generator.configGenerator(HOST, SENDER, SENDER, ApiType.BLOCKING, qos);
 
-        Assert.assertTrue(published);
+        Assert.assertTrue(apollo.publish(topic, config));
     }
 
     @Test
-    public void testFuture() throws Exception {
-        TopicBO topic = topicGenerator("test", "Hello Future");
-        ConfigBO config = configGenerator(HOST, USERNAME, PASSWORD, ApiType.FUTURE, qos);
-        boolean published = apollo.publish(topic, config);
+    public void testPFuture() throws Exception {
+        TopicBO topic = generator.topicGenerator("test", "Hello Future");
+        ConfigBO config = generator.configGenerator(HOST, SENDER, SENDER, ApiType.FUTURE, qos);
 
-        Assert.assertTrue(published);
+        Assert.assertTrue(apollo.publish(topic, config));
     }
 
     @Test
-    public void testCallback() throws Exception {
-        TopicBO topic = topicGenerator("test", "Hello Callback");
-        ConfigBO config = configGenerator(HOST, USERNAME, PASSWORD, ApiType.CALLBACK, qos);
-        boolean published = apollo.publish(topic, config);
+    public void testPCallback() throws Exception {
+        TopicBO topic = generator.topicGenerator("test", "Hello Callback");
+        ConfigBO config = generator.configGenerator(HOST, SENDER, SENDER, ApiType.CALLBACK, qos);
 
-        Assert.assertTrue(published);
+        Assert.assertTrue(apollo.publish(topic, config));
 
     }
 
-    private TopicBO topicGenerator(String destination, String content) {
-        TopicBO topicBO = new TopicBO();
-        topicBO.setDestination(destination);
-        topicBO.setContent(content);
-
-        return topicBO;
-    }
-
-    private ConfigBO configGenerator(String host, String username, String password, ApiType apiType, QoS qoSType) {
-        ConfigBO configBO = new ConfigBO();
-        configBO.setHost(host);
-        configBO.setUsername(username);
-        configBO.setPassword(password);
-        configBO.setApiType(apiType);
-        configBO.setQoSType(qoSType);
-
-        return configBO;
-    }
 }

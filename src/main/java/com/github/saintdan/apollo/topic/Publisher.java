@@ -6,6 +6,9 @@ import com.github.saintdan.enums.ApiType;
 import com.github.saintdan.enums.ErrorType;
 import com.github.saintdan.exception.PublishException;
 import com.github.saintdan.util.CallbackImpl;
+import com.github.saintdan.util.ConnectionListenerImpl;
+import org.fusesource.hawtbuf.Buffer;
+import org.fusesource.hawtbuf.UTF8Buffer;
 import org.fusesource.mqtt.client.*;
 
 import java.net.URISyntaxException;
@@ -13,6 +16,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Packaging api for publish.
+ *
  * @author <a href="http://github.com/saintdan">Liao Yifan</a>
  * @date 5/28/15
  * @since JDK1.8
@@ -28,6 +33,11 @@ public class Publisher {
 
     private boolean isPublished = false;
 
+    /**
+     * Constructor of Publisher.
+     *
+     * @param config    ConfigBO {@link ConfigBO}
+     */
     public Publisher(ConfigBO config) {
         this.host = config.getHost();
         this.username = config.getUsername();
@@ -36,6 +46,12 @@ public class Publisher {
         this.qoSType = config.getQoSType();
     }
 
+    /**
+     * Publish messages to a topic.
+     *
+     * @param topic     TopicBO {@link TopicBO}
+     * @return boolean  isSuccess
+     */
     public boolean pub(TopicBO topic) {
         boolean isSuccess = false;
         try {
@@ -75,6 +91,13 @@ public class Publisher {
         return isSuccess;
     }
 
+    /**
+     * Blocking API.
+     *
+     * @param topic     TopicBO {@link TopicBO}
+     * @param mqtt      MQTT {@link MQTT}
+     * @return boolean  isPublished
+     */
     private boolean blocking(TopicBO topic, MQTT mqtt) {
         BlockingConnection connection = mqtt.blockingConnection();
         try {
@@ -88,15 +111,22 @@ public class Publisher {
         if (connection.isConnected()) {
             try {
                 connection.publish(topic.getDestination(), topic.getContent().getBytes(), qoSType, false);
+                isPublished = true;
                 connection.disconnect();
             } catch (Exception e) {
                 System.out.println("Blocking publish error: " + e + ErrorType.PUB0010);
             }
-            isPublished = true;
         }
         return isPublished;
     }
 
+    /**
+     * Future API.
+     *
+     * @param topic     TopicBO {@link TopicBO}
+     * @param mqtt      MQTT {@link MQTT}
+     * @return boolean  isPublished
+     */
     private boolean future(TopicBO topic, MQTT mqtt) {
         FutureConnection connection = mqtt.futureConnection();
         connection.connect();
@@ -105,12 +135,19 @@ public class Publisher {
 
         if (connection.isConnected()) {
             connection.publish(topic.getDestination(), topic.getContent().getBytes(), qoSType, false);
-            connection.disconnect();
             isPublished = true;
+            connection.disconnect();
         }
         return isPublished;
     }
 
+    /**
+     * Callback API.
+     *
+     * @param topic     TopicBO {@link TopicBO}
+     * @param mqtt      MQTT {@link MQTT}
+     * @return boolean  isPublished
+     */
     private boolean callback(TopicBO topic, MQTT mqtt) {
 
         final CallbackConnection connection = mqtt.callbackConnection();

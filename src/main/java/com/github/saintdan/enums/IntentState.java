@@ -1,7 +1,8 @@
 package com.github.saintdan.enums;
 
 /**
- * Intent State interface
+ * Intent State interface.
+ *
  * @author <a href="http://github.com/saintdan">Liao Yifan</a>
  * @date 6/3/15
  * @since JDK1.8

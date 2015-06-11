@@ -2,6 +2,7 @@ package com.github.saintdan.bo;
 
 /**
  * Topic BO.
+ *
  * @author Liao Yifan
  * @date 5/28/15
  * @since JDK1.8

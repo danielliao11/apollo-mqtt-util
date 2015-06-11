@@ -5,6 +5,7 @@ import org.fusesource.mqtt.client.QoS;
 
 /**
  * Config BO.
+ *
  * @author Liao Yifan
  * @date 5/28/15
  * @since JDK1.8
