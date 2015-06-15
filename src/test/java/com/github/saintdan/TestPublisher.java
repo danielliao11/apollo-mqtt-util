@@ -22,7 +22,7 @@ public class TestPublisher {
     private static final Apollo apollo = new ApolloImpl();
     private static final Generator generator = new Generator();
 
-    private static final String HOST = "tcp://192.168.100.10:61613";
+    private static final String HOST = "tcp://localhost:61613";
     private static final String SENDER = "sender";
     private static final QoS qos = QoS.AT_LEAST_ONCE;
 
