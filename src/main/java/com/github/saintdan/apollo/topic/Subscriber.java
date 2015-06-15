@@ -115,7 +115,7 @@ public class Subscriber {
      * @param topic     TopicBO {@link TopicBO}
      * @param mqtt      MQTT {@link MQTT}
      */
-    private void callback(TopicBO topic, MQTT mqtt) {
+    private void callback(final TopicBO topic, MQTT mqtt) {
         final CallbackConnection connection = mqtt.callbackConnection();
 
         final CountDownLatch finished = new CountDownLatch(1);

@@ -103,7 +103,8 @@ public class Publisher {
         try {
             connection.connect();
         } catch (Exception e) {
-            System.out.println("Blocking connection error: " + e + ErrorType.CNN0010);
+            e.printStackTrace();
+            System.out.println("Blocking connection error: " + e + ", and ErrorType is: " + ErrorType.CNN0010);
         }
 
         while (!connection.isConnected());
@@ -114,7 +115,8 @@ public class Publisher {
                 isPublished = true;
                 connection.disconnect();
             } catch (Exception e) {
-                System.out.println("Blocking publish error: " + e + ErrorType.PUB0010);
+                e.printStackTrace();
+                System.out.println("Blocking publish error: " + e + ", and ErrorType is: " + ErrorType.PUB0010);
             }
         }
         return isPublished;
@@ -129,14 +131,24 @@ public class Publisher {
      */
     private boolean future(TopicBO topic, MQTT mqtt) {
         FutureConnection connection = mqtt.futureConnection();
-        connection.connect();
+        try {
+            connection.connect();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Future connection error: " + e + ", and ErrorType is: " + ErrorType.CNN0020);
+        }
 
         while (!connection.isConnected());
 
         if (connection.isConnected()) {
-            connection.publish(topic.getDestination(), topic.getContent().getBytes(), qoSType, false);
-            isPublished = true;
-            connection.disconnect();
+            try {
+                connection.publish(topic.getDestination(), topic.getContent().getBytes(), qoSType, false);
+                isPublished = true;
+                connection.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Future publish error: " + e + ", and ErrorType is: " + ErrorType.PUB0020);
+            }
         }
         return isPublished;
     }
@@ -148,24 +160,30 @@ public class Publisher {
      * @param mqtt      MQTT {@link MQTT}
      * @return boolean  isPublished
      */
-    private boolean callback(TopicBO topic, MQTT mqtt) {
+    private boolean callback(final TopicBO topic, MQTT mqtt) {
 
         final CallbackConnection connection = mqtt.callbackConnection();
         final CountDownLatch finished = new CountDownLatch(1);
 
-        connection.connect(new CallbackImpl(){
-            @Override
-            public void onSuccess(Object value) {
-                connection.publish(topic.getDestination(), topic.getContent().getBytes(), qoSType, false, null);
-                finished.countDown();
-            }
-        });
+        try {
+            connection.connect(new CallbackImpl(){
+                @Override
+                public void onSuccess(Object value) {
+                    connection.publish(topic.getDestination(), topic.getContent().getBytes(), qoSType, false, null);
+                    finished.countDown();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Callback connection error: " + e + ", and ErrorType is: " + ErrorType.CNN0030);
+        }
 
         try {
             finished.await();
             isPublished = true;
         } catch (InterruptedException e) {
             e.printStackTrace();
+            System.out.println("Callback publish error: " + e + ", and ErrorType is: " + ErrorType.PUB0030);
         }
         return isPublished;
     }
