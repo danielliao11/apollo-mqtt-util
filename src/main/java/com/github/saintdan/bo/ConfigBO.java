@@ -13,6 +13,7 @@ import org.fusesource.mqtt.client.QoS;
 public class ConfigBO {
 
     private String host; // Host
+    private int port; // Port
     private String username; // Username
     private String password; // Password
     private ApiType apiType; // api type
@@ -24,6 +25,14 @@ public class ConfigBO {
 
     public void setHost(String host) {
         this.host = host;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public String getUsername() {

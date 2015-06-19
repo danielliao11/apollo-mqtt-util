@@ -19,14 +19,15 @@ public class TestSubscriber {
     private static final Apollo apollo = new ApolloImpl();
     private static final Generator generator = new Generator();
 
-    private static final String HOST = "tcp://localhost:61613";
+    private static final String HOST = "localhost";
+    private static final int PORT = 61613;
     private static final String RECEIVER = "receiver";
     private static final QoS qos = QoS.AT_LEAST_ONCE;
 
     @Test
     public void testSCallback() throws Exception {
         TopicBO topic = generator.topicGenerator("test", "");
-        ConfigBO config = generator.configGenerator(HOST, RECEIVER, RECEIVER, ApiType.CALLBACK, qos);
+        ConfigBO config = generator.configGenerator(HOST, PORT, RECEIVER, RECEIVER, ApiType.CALLBACK, qos);
 
         apollo.subscribe(topic, config);
     }

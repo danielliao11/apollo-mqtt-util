@@ -24,6 +24,7 @@ public class Subscriber {
     private final static short KEEP_ALIVE = 30;
 
     private String host;
+    private int port;
     private String username;
     private String password;
     private ApiType apiType;
@@ -36,6 +37,7 @@ public class Subscriber {
      */
     public Subscriber(ConfigBO config) {
         this.host = config.getHost();
+        this.port = config.getPort();
         this.username = config.getUsername();
         this.password = config.getPassword();
         this.apiType = config.getApiType();
@@ -51,7 +53,7 @@ public class Subscriber {
 
         try {
             MQTT mqtt = new MQTT();
-            mqtt.setHost(host);
+            mqtt.setHost("tcp://" + host + ":" + port);
             mqtt.setUserName(username);
             mqtt.setPassword(password);
             mqtt.setKeepAlive(KEEP_ALIVE);

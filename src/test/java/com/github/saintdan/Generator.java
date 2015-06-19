@@ -20,9 +20,10 @@ public class Generator {
         return topicBO;
     }
 
-    public ConfigBO configGenerator(String host, String username, String password, ApiType apiType, QoS qoSType) {
+    public ConfigBO configGenerator(String host,int port, String username, String password, ApiType apiType, QoS qoSType) {
         ConfigBO configBO = new ConfigBO();
         configBO.setHost(host);
+        configBO.setPort(port);
         configBO.setUsername(username);
         configBO.setPassword(password);
         configBO.setApiType(apiType);
