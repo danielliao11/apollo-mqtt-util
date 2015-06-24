@@ -1,11 +1,14 @@
-#Mac Files
+# Folder view configuration files
 .DS_Store
+Desktop.ini
+
+# Thumbnail cache files
+Thumbs.db
 
 # Eclipse Files
 .settings/
 .project
 .classpath
-.gradle/
 
 # Idea Files
 .idea/
@@ -13,16 +16,23 @@
 *.iml
 *.ipr
 *.iws
+*.idea
 
 # Package Files #
 *.jar
-*.war                                                                                                   
+*.war
 *.ear
 
 # build dir
-/build
-/bin
-/target
+.gradle/
+build/
+target/
+bin/
 
-# 
+# Others
 hs_err_pid*
+*.sw?
+.#*
+*#
+*~
+*.sublime-*
