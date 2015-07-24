@@ -36,9 +36,13 @@ ext {
 }
 
 dependencies {
-    compile group: "org.fusesource.mqtt-client", name: "mqtt-client", version: "${mqttClientVersion}"
+    compile "org.fusesource.mqtt-client:mqtt-client:${mqttClientVersion}"
 
-    testCompile group: "junit", name: "junit", version: "${junitVersion}"
+    testCompile "junit:junit:${junitVersion}"
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.5'
 }
 
 apply from: 'gradle-mvn-push-for-jar.gradle'

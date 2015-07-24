@@ -3,6 +3,8 @@ package com.github.saintdan.bo;
 import com.github.saintdan.enums.ApiType;
 import org.fusesource.mqtt.client.QoS;
 
+import java.io.Serializable;
+
 /**
  * Config BO.
  *
@@ -10,8 +12,9 @@ import org.fusesource.mqtt.client.QoS;
  * @date 5/28/15
  * @since JDK1.8
  */
-public class ConfigBO {
+public class ConfigBO implements Serializable {
 
+    private static final long serialVersionUID = 5338545675886226340L;
     private String host; // Host
     private int port; // Port
     private String username; // Username
