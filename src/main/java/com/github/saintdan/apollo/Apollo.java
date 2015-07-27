@@ -3,6 +3,10 @@ package com.github.saintdan.apollo;
 import com.github.saintdan.bo.ConfigBO;
 import com.github.saintdan.bo.TopicBO;
 import com.github.saintdan.enums.ApiType;
+import com.github.saintdan.exception.ConnectionException;
+import com.github.saintdan.exception.MQTTException;
+import com.github.saintdan.exception.PublishException;
+import com.github.saintdan.exception.SubscriberException;
 import org.fusesource.mqtt.client.QoS;
 
 /**
@@ -15,19 +19,31 @@ import org.fusesource.mqtt.client.QoS;
 public interface Apollo {
 
     /**
-     * Publish.
+     * Back-end publish.
      *
-     * @param topic     TopicBO {@link TopicBO}
-     * @param config    ConfigBO {@link ConfigBO}
-     * @return boolean  isSuccess
+     * @param topic
+     *                  TopicBO {@link TopicBO}
+     * @param config
+     *                  ConfigBO {@link ConfigBO}
+     * @return
+     *                  publish or not
+     *
+     * @throws ConnectionException
+     * @throws PublishException
+     * @throws MQTTException
      */
-    public boolean publish(TopicBO topic, ConfigBO config);
+    boolean publish(TopicBO topic, ConfigBO config) throws ConnectionException, PublishException, MQTTException;
 
     /**
-     * Subscribe.
+     * Back-end subscribe.
      *
-     * @param topic     TopicBO {@link TopicBO}
-     * @param config    ConfigBO {@link ConfigBO}
+     * @param topic
+     *                  TopicBO {@link TopicBO}
+     * @param config
+     *                  ConfigBO {@link ConfigBO}
+     *
+     * @throws SubscriberException
+     * @throws MQTTException
      */
-    public void subscribe(TopicBO topic, ConfigBO config);
+    void subscribe(TopicBO topic, ConfigBO config) throws SubscriberException, MQTTException;
 }

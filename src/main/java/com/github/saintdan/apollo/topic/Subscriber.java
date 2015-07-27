@@ -4,6 +4,7 @@ import com.github.saintdan.bo.ConfigBO;
 import com.github.saintdan.bo.TopicBO;
 import com.github.saintdan.enums.ApiType;
 import com.github.saintdan.enums.ErrorType;
+import com.github.saintdan.exception.MQTTException;
 import com.github.saintdan.exception.SubscriberException;
 import com.github.saintdan.util.CallbackImpl;
 import com.github.saintdan.util.ConnectionListenerImpl;
@@ -16,13 +17,13 @@ import java.util.concurrent.CountDownLatch;
 
 /**
  * Packaging api for subscribe.
+ *
  * @author <a href="http://github.com/saintdan">Liao Yifan</a>
  * @date 5/28/15
  * @since JDK1.8
  */
 public class Subscriber {
     private final static short KEEP_ALIVE = 30;
-
     private String host;
     private int port;
     private String username;
@@ -33,7 +34,8 @@ public class Subscriber {
     /**
      * Constructor of Subscriber.
      *
-     * @param config    ConfigBO {@link ConfigBO}
+     * @param config
+     *                  ConfigBO {@link ConfigBO}
      */
     public Subscriber(ConfigBO config) {
         this.host = config.getHost();
@@ -47,9 +49,13 @@ public class Subscriber {
     /**
      * Subscribe messages from a topic.
      *
-     * @param topic     TopicBO {@link TopicBO}
+     * @param topic
+     *                  TopicBO {@link TopicBO}
+     *
+     * @throws SubscriberException
+     * @throws MQTTException
      */
-    public void sub(TopicBO topic) {
+    public void sub(TopicBO topic) throws SubscriberException, MQTTException {
 
         try {
             MQTT mqtt = new MQTT();
@@ -60,64 +66,59 @@ public class Subscriber {
 
             switch (apiType) {
                 case BLOCKING:
-                    try {
-                        blocking(topic, mqtt);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        throw new SubscriberException(ErrorType.SUB0010);
-                    }
+                    blocking(topic, mqtt);
                     break;
                 case FUTURE:
-                    try {
-                        future(topic, mqtt);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        throw new SubscriberException(ErrorType.SUB0020);
-                    }
+                    future(topic, mqtt);
                     break;
                 case CALLBACK:
-                    try {
-                        callback(topic, mqtt);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        throw new SubscriberException(ErrorType.SUB0030);
-                    }
+                    callback(topic, mqtt);
                     break;
                 default:
                     throw new SubscriberException(ErrorType.SUB0001);
             }
         } catch (URISyntaxException e) {
-            e.printStackTrace();
-        } catch (SubscriberException e) {
-            System.out.println("Subscribe failed, and the exception is:" + e);
+            throw new MQTTException(ErrorType.MQT0001);
         }
     }
 
     /**
      * Blocking API.
      *
-     * @param topic     TopicBO {@link TopicBO}
-     * @param mqtt      MQTT {@link MQTT}
+     * @param topic
+     *                  TopicBO {@link TopicBO}
+     * @param mqtt
+     *                  MQTT {@link MQTT}
+     *
+     * @throws SubscriberException
      */
-    private void blocking(TopicBO topic, MQTT mqtt) {
+    private void blocking(TopicBO topic, MQTT mqtt) throws SubscriberException {
     }
 
     /**
      * Future API.
      *
-     * @param topic     TopicBO {@link TopicBO}
-     * @param mqtt      MQTT {@link MQTT}
+     * @param topic
+     *                  TopicBO {@link TopicBO}
+     * @param mqtt
+     *                  MQTT {@link MQTT}
+     *
+     * @throws SubscriberException
      */
-    private void future(TopicBO topic, MQTT mqtt) {
+    private void future(TopicBO topic, MQTT mqtt) throws SubscriberException {
     }
 
     /**
      * Callback API.
      *
-     * @param topic     TopicBO {@link TopicBO}
-     * @param mqtt      MQTT {@link MQTT}
+     * @param topic
+     *                  TopicBO {@link TopicBO}
+     * @param mqtt
+     *                  MQTT {@link MQTT}
+     *
+     * @throws SubscriberException
      */
-    private void callback(final TopicBO topic, MQTT mqtt) {
+    private void callback(final TopicBO topic, MQTT mqtt) throws SubscriberException {
         final CallbackConnection connection = mqtt.callbackConnection();
 
         final CountDownLatch finished = new CountDownLatch(1);
@@ -151,7 +152,7 @@ public class Subscriber {
         try {
             finished.await();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw new SubscriberException(ErrorType.SUB0030);
         }
     }
 

@@ -29,3 +29,7 @@ and you'll find the jar in <project_root_directory>/build/libs.
   
 - 0.3.1-SNAPSHOT
   - Modify build.gradle.
+  
+- 0.3.2-RELEASE
+  - Optimize Publisher and Subscriber.
+  - Add MQTTException.

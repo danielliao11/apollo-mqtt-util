@@ -30,6 +30,9 @@ public enum ErrorType implements IntentState {
     SUB0020("Future subscriber error."),
     SUB0030("Callback subscriber error."),
 
+    // MQTT
+    MQT0001("MQTT error."),
+
     // Unknown error.
     UNKNOWN("unknown error."),;
 

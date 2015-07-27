@@ -4,6 +4,8 @@ import com.github.saintdan.bo.ConfigBO;
 import com.github.saintdan.bo.TopicBO;
 import com.github.saintdan.enums.ApiType;
 import com.github.saintdan.enums.ErrorType;
+import com.github.saintdan.exception.ConnectionException;
+import com.github.saintdan.exception.MQTTException;
 import com.github.saintdan.exception.PublishException;
 import com.github.saintdan.util.CallbackImpl;
 import com.github.saintdan.util.ConnectionListenerImpl;
@@ -23,8 +25,8 @@ import java.util.concurrent.TimeUnit;
  * @since JDK1.8
  */
 public class Publisher {
-    private final static short KEEP_ALIVE = 30;
 
+    private final static short KEEP_ALIVE = 30;
     private String host;
     private int port;
     private String username;
@@ -32,12 +34,11 @@ public class Publisher {
     private ApiType apiType;
     private QoS qoSType;
 
-    private boolean isPublished = false;
-
     /**
      * Constructor of Publisher.
      *
-     * @param config    ConfigBO {@link ConfigBO}
+     * @param config
+     *                  ConfigBO {@link ConfigBO}
      */
     public Publisher(ConfigBO config) {
         this.host = config.getHost();
@@ -51,11 +52,16 @@ public class Publisher {
     /**
      * Publish messages to a topic.
      *
-     * @param topic     TopicBO {@link TopicBO}
-     * @return boolean  isSuccess
+     * @param topic
+     *                  TopicBO {@link TopicBO}
+     * @return boolean
+     *                  publish or not
+     *
+     * @throws ConnectionException
+     * @throws PublishException
+     * @throws MQTTException
      */
-    public boolean pub(TopicBO topic) {
-        boolean isSuccess = false;
+    public boolean pub(TopicBO topic) throws ConnectionException, PublishException, MQTTException {
         try {
             MQTT mqtt = new MQTT();
             mqtt.setHost("tcp://" + host + ":" + port);
@@ -65,48 +71,42 @@ public class Publisher {
 
             switch (apiType) {
                 case BLOCKING:
-                    isSuccess = blocking(topic, mqtt);
-                    if (!isSuccess) {
-                        throw new PublishException(ErrorType.PUB0010);
-                    }
+                    blocking(topic, mqtt);
                     break;
                 case FUTURE:
-                    isSuccess = future(topic, mqtt);
-                    if (!isSuccess) {
-                        throw new PublishException(ErrorType.PUB0020);
-                    }
+                    future(topic, mqtt);
                     break;
                 case CALLBACK:
-                    isSuccess = callback(topic, mqtt);
-                    if (!isSuccess) {
-                        throw new PublishException(ErrorType.PUB0030);
-                    }
+                    callback(topic, mqtt);
                     break;
                 default:
                     throw new PublishException(ErrorType.PUB0001);
             }
         } catch (URISyntaxException e) {
-            e.printStackTrace();
-        } catch (PublishException e) {
-            System.out.println("Publish failed, and the exception is:" + e);
+            throw new MQTTException(ErrorType.MQT0001);
         }
-        return isSuccess;
+        return true;
     }
 
     /**
      * Blocking API.
      *
-     * @param topic     TopicBO {@link TopicBO}
-     * @param mqtt      MQTT {@link MQTT}
-     * @return boolean  isPublished
+     * @param topic
+     *                  TopicBO {@link TopicBO}
+     * @param mqtt
+     *                  MQTT {@link MQTT}
+     * @return
+     *                  publish or not
+     *
+     * @throws ConnectionException
+     * @throws PublishException
      */
-    private boolean blocking(TopicBO topic, MQTT mqtt) {
+    private boolean blocking(TopicBO topic, MQTT mqtt) throws ConnectionException, PublishException {
         BlockingConnection connection = mqtt.blockingConnection();
         try {
             connection.connect();
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Blocking connection error: " + e + ", and ErrorType is: " + ErrorType.CNN0010);
+            throw new ConnectionException(ErrorType.CNN0010);
         }
 
         while (!connection.isConnected());
@@ -114,30 +114,33 @@ public class Publisher {
         if (connection.isConnected()) {
             try {
                 connection.publish(topic.getDestination(), topic.getContent().getBytes(), qoSType, false);
-                isPublished = true;
                 connection.disconnect();
             } catch (Exception e) {
-                e.printStackTrace();
-                System.out.println("Blocking publish error: " + e + ", and ErrorType is: " + ErrorType.PUB0010);
+                throw new PublishException(ErrorType.PUB0010);
             }
         }
-        return isPublished;
+        return true;
     }
 
     /**
      * Future API.
      *
-     * @param topic     TopicBO {@link TopicBO}
-     * @param mqtt      MQTT {@link MQTT}
-     * @return boolean  isPublished
+     * @param topic
+     *                  TopicBO {@link TopicBO}
+     * @param mqtt
+     *                  MQTT {@link MQTT}
+     * @return
+     *                  publish or not
+     *
+     * @throws ConnectionException
+     * @throws PublishException
      */
-    private boolean future(TopicBO topic, MQTT mqtt) {
+    private boolean future(TopicBO topic, MQTT mqtt) throws ConnectionException, PublishException {
         FutureConnection connection = mqtt.futureConnection();
         try {
             connection.connect();
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Future connection error: " + e + ", and ErrorType is: " + ErrorType.CNN0020);
+            throw new ConnectionException(ErrorType.CNN0020);
         }
 
         while (!connection.isConnected());
@@ -145,24 +148,28 @@ public class Publisher {
         if (connection.isConnected()) {
             try {
                 connection.publish(topic.getDestination(), topic.getContent().getBytes(), qoSType, false);
-                isPublished = true;
                 connection.disconnect();
             } catch (Exception e) {
-                e.printStackTrace();
-                System.out.println("Future publish error: " + e + ", and ErrorType is: " + ErrorType.PUB0020);
+                throw new PublishException(ErrorType.PUB0020);
             }
         }
-        return isPublished;
+        return true;
     }
 
     /**
      * Callback API.
      *
-     * @param topic     TopicBO {@link TopicBO}
-     * @param mqtt      MQTT {@link MQTT}
-     * @return boolean  isPublished
+     * @param topic
+     *                  TopicBO {@link TopicBO}
+     * @param mqtt
+     *                  MQTT {@link MQTT}
+     * @return
+     *                  publish or not
+     *
+     * @throws ConnectionException
+     * @throws PublishException
      */
-    private boolean callback(final TopicBO topic, MQTT mqtt) {
+    private boolean callback(final TopicBO topic, MQTT mqtt) throws ConnectionException, PublishException {
 
         final CallbackConnection connection = mqtt.callbackConnection();
         final CountDownLatch finished = new CountDownLatch(1);
@@ -176,18 +183,15 @@ public class Publisher {
                 }
             });
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Callback connection error: " + e + ", and ErrorType is: " + ErrorType.CNN0030);
+            throw new ConnectionException(ErrorType.CNN0030);
         }
 
         try {
             finished.await();
-            isPublished = true;
         } catch (InterruptedException e) {
-            e.printStackTrace();
-            System.out.println("Callback publish error: " + e + ", and ErrorType is: " + ErrorType.PUB0030);
+            throw new PublishException(ErrorType.PUB0030);
         }
-        return isPublished;
+        return true;
     }
 
 }
