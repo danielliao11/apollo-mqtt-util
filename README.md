@@ -1,6 +1,8 @@
 # Apollo Mqtt Util
 
-Packaging some util for Apache Apollo.
+Packaging some util for Apache Apollo.  
+You can use Apollo Mqtt Util to build your own message publish/subscribe system,
+or you can use Apollo Mqtt Util to build an IM with some other front-end work. :)
 
 ## Usage
 1. Build your apollo service. :P
